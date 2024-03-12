@@ -18,4 +18,6 @@ def get_digits_of_pi(precision):
          Decimal(1)/(8*k+5) -
          Decimal(1)/(8*k+6)) for k in tqdm(range(precision))))
     
-    
+
+if __name__ == '__main__':
+    print(get_digits_of_pi(123))
