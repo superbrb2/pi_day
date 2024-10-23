@@ -197,6 +197,6 @@ for i in range(0,4):
     full_image.paste(img_1,(WIDTH,HEIGHT))
 
 
-    full_image.save(str(WIDTH)+'x'+str(HEIGHT)+'/'+colour_mode+str(WIDTH)+'x'+str(HEIGHT)+'test.png')
+    full_image.save(str(WIDTH)+'x'+str(HEIGHT)+'/'+colour_mode+str(WIDTH)+'x'+str(HEIGHT)+'.png')
     
 

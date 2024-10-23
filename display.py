@@ -1,24 +1,47 @@
 import BBP
 from PIL import Image, ImageOps, ImageTk
-from tqdm import tqdm, gui
+from tqdm import tk
+from tqdm.gui import trange, tqdm
 import os
 import random
-import tkinter as tk
+import tkinter as tkin
+import tkinter.ttk as ttk
+from typing import Union
 
-
-
-
+class tk_display:
+    def __init__(self):
+        self.wn = tkin.Tk()
+        self.wn.title('Pi')
+        
+        self.canvas = tkin.Canvas(self.wn,width=500,height=500)
+        self.canvas.pack()
+    
+    
+    def display_progress(self,i: int): # type: ignore              
+        return tk.ttkrange(i,tk_parent=self.wn)
+    
+    
+    def update_screen(self,img: Image):
+        if img != None:
+            resize = img.resize((img.width*5,img.height*5))
+            new_image = ImageTk.PhotoImage(resize)
+            
+        self.canvas.create_image((0,0),image=new_image,anchor='nw')
+        self.wn.update()
+        
+    def close(self):
+        self.wn.destroy()
 
 if not os.path.isdir('display/'):
     os.mkdir('display/')
 
-for i in range(50,100): 
+for i in range(90,200): 
     WIDTH = HEIGHT = i
     is_random = False
 
     print('---Calulating PI---')
     print(f'\nDecimal places -> {(WIDTH*HEIGHT*3)+5}\n')
-
+    
     pi = BBP.BBP_mp((WIDTH*HEIGHT*3)+5)
     img = Image.new(mode='RGB', size=(WIDTH,HEIGHT))
     num = 3
@@ -36,7 +59,10 @@ for i in range(50,100):
             case 3:
                 colour_mode = 'All'
 
-        for row in tqdm(range(WIDTH),colour='red'):
+        # for row in tk.ttkrange(WIDTH):
+
+        display = tk_display()
+        for row in display.display_progress(WIDTH):
             for col in range(HEIGHT):
                 if not is_random:
                     hex_1, hex_2, hex_3 = int(pi[num])*28, int(pi[num+1])*28, int(pi[num+2])*28
@@ -76,6 +102,20 @@ for i in range(50,100):
                 
                         
                 img.putpixel(value=(hex_1,hex_2,hex_3),xy=(row,col))
+                
+                img_1 = img
+                img_2 = ImageOps.mirror(img_1)
+                img_3 = ImageOps.flip(img_2)
+                img_4 = ImageOps.flip(img_1)
+
+                full_image = Image.new('RGB',(WIDTH*2,HEIGHT*2))
+
+                full_image.paste(img_3,(0,0))
+                full_image.paste(img_4,(WIDTH,0))
+                full_image.paste(img_2,(0,HEIGHT))
+                full_image.paste(img_1,(WIDTH,HEIGHT))
+
+                display.update_screen(full_image)
                 
                 num += 3
                 for i in range(HEIGHT-1):
@@ -130,7 +170,8 @@ for i in range(50,100):
                                 temp = img.getpixel((j,i))
                                 img.putpixel((j,i),img.getpixel((i,j+1)))
                                 img.putpixel((j,i+1),temp)
-                        
+        display.close()
+        del display                
                         
         for i in range(HEIGHT-1):
             for j in range(HEIGHT-i-1):
@@ -184,18 +225,18 @@ for i in range(50,100):
                     img.putpixel((j,i),img.getpixel((i,j+1)))
                     img.putpixel((j,i+1),temp)
                     
-        img_1 = img
-        img_2 = ImageOps.mirror(img_1)
-        img_3 = ImageOps.flip(img_2)
-        img_4 = ImageOps.flip(img_1)
+            img_1 = img
+            img_2 = ImageOps.mirror(img_1)
+            img_3 = ImageOps.flip(img_2)
+            img_4 = ImageOps.flip(img_1)
 
-        full_image = Image.new('RGB',(WIDTH*2,HEIGHT*2))
+            full_image = Image.new('RGB',(WIDTH*2,HEIGHT*2))
 
-        full_image.paste(img_3,(0,0))
-        full_image.paste(img_4,(WIDTH,0))
-        full_image.paste(img_2,(0,HEIGHT))
-        full_image.paste(img_1,(WIDTH,HEIGHT))
+            full_image.paste(img_3,(0,0))
+            full_image.paste(img_4,(WIDTH,0))
+            full_image.paste(img_2,(0,HEIGHT))
+            full_image.paste(img_1,(WIDTH,HEIGHT))
 
-        image_name = "display/"+colour_mode+str(WIDTH)+'x'+str(HEIGHT)+'test.png'
-        full_image.save(image_name)
+            image_name = "display/"+colour_mode+str(WIDTH)+'x'+str(HEIGHT)+'test.png'
+            full_image.save(image_name)
         
