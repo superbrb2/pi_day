@@ -17,7 +17,7 @@ def get_digits_of_pi(precision):
         (Decimal(4)/(8*k+1) - 
          Decimal(2)/(8*k+4) - 
          Decimal(1)/(8*k+5) -
-         Decimal(1)/(8*k+6)) for k in tqdm(range(precision))))
+         Decimal(1)/(8*k+6)) for k in tqdm(range(precision),colour='green')))
 
 
 def BBP_mp(precision):
@@ -25,7 +25,7 @@ def BBP_mp(precision):
     
     pi = mp.mpf(0)  # Initialize π as a mpmath floating-point number
     
-    for k in tqdm(range(precision)):
+    for k in tqdm(range(precision),colour='green'):
         term = (1 / mp.power(16, k) * 
                 (4 / (8 * k + 1) - 
                  2 / (8 * k + 4) - 

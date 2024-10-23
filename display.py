@@ -1,40 +1,18 @@
 import BBP
 from PIL import Image, ImageOps, ImageTk
-from tqdm import tqdm
+from tqdm import tqdm, gui
 import os
 import random
 import tkinter as tk
 
-def display_image():
-    if not os.path.isdir('display/'):
-        os.mkdir('display/')
-        
-    for i in range(30,100):
-        file_name, h, l = make_image(i)
-        wn = tk.Tk()
-        wn.title('Pi')
-        
-        canvas = tk.Canvas(wn)
-        canvas.pack()
 
-        img = Image.open(file_name)
-        resize = img.resize((h*3,l*3))
-        new_image = ImageTk.PhotoImage(resize)
-        
-        canvas.create_image((0,0),image=new_image,anchor='nw')   
-        
-        wn.mainloop()
-    
 
 
 
 if not os.path.isdir('display/'):
     os.mkdir('display/')
 
-for i in range(50,100):
-   pass
-   
-def make_image(i): 
+for i in range(50,100): 
     WIDTH = HEIGHT = i
     is_random = False
 
@@ -58,7 +36,7 @@ def make_image(i):
             case 3:
                 colour_mode = 'All'
 
-        for row in tqdm(range(WIDTH)):
+        for row in tqdm(range(WIDTH),colour='red'):
             for col in range(HEIGHT):
                 if not is_random:
                     hex_1, hex_2, hex_3 = int(pi[num])*28, int(pi[num+1])*28, int(pi[num+2])*28
@@ -221,9 +199,3 @@ def make_image(i):
         image_name = "display/"+colour_mode+str(WIDTH)+'x'+str(HEIGHT)+'test.png'
         full_image.save(image_name)
         
-        return image_name, HEIGHT*2, WIDTH*2
-    
-    
-    
-if __name__ == '__main__':
-    display_image()
