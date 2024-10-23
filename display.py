@@ -6,25 +6,34 @@ import os
 import random
 import tkinter as tkin
 import tkinter.ttk as ttk
-from typing import Union
+
+import time
 
 class tk_display:
-    def __init__(self):
+    def __init__(self,wn_size):
         self.wn = tkin.Tk()
         self.wn.title('Pi')
         
-        self.canvas = tkin.Canvas(self.wn,width=500,height=500)
+        self.canvas = tkin.Canvas(self.wn,width=wn_size*10,height=wn_size*10)
         self.canvas.pack()
     
     
-    def display_progress(self,i: int): # type: ignore              
+    def display_progress(self,i: int):              
         return tk.ttkrange(i,tk_parent=self.wn)
     
+    def diplay_final_product(self,img: Image):
+        resize = img.resize((img.width*5,img.height*5))
+        new_image = ImageTk.PhotoImage(resize)
+            
+        self.canvas.create_image((0,0),image=new_image,anchor='nw')
+        self.canvas.update()
+        self.wn.attributes("-topmost", True)
+        time.sleep(3)
+        
     
     def update_screen(self,img: Image):
-        if img != None:
-            resize = img.resize((img.width*5,img.height*5))
-            new_image = ImageTk.PhotoImage(resize)
+        resize = img.resize((img.width*5,img.height*5))
+        new_image = ImageTk.PhotoImage(resize)
             
         self.canvas.create_image((0,0),image=new_image,anchor='nw')
         self.wn.update()
@@ -35,14 +44,26 @@ class tk_display:
 if not os.path.isdir('display/'):
     os.mkdir('display/')
 
-for i in range(90,200): 
+for i in range(50,200): 
     WIDTH = HEIGHT = i
     is_random = False
-
+    no_digits_of_pi = (WIDTH*HEIGHT*3)+7
     print('---Calulating PI---')
-    print(f'\nDecimal places -> {(WIDTH*HEIGHT*3)+5}\n')
-    
-    pi = BBP.BBP_mp((WIDTH*HEIGHT*3)+5)
+    print(f'\nDecimal places -> {no_digits_of_pi}\n')
+    with open('pi.txt','a'):
+        pass
+    with open('pi.txt','r') as pi_file:
+        pi_number = pi_file.read()
+        print(len(pi_number))
+        if no_digits_of_pi < len(pi_number):
+            pi = pi_number[2:no_digits_of_pi]
+
+        else:
+            pi_file.close()
+            with open('pi.txt','w') as new_pi:
+                pi = BBP.get_digits_of_pi(no_digits_of_pi)
+                new_pi.write(pi)
+                
     img = Image.new(mode='RGB', size=(WIDTH,HEIGHT))
     num = 3
 
@@ -51,17 +72,17 @@ for i in range(90,200):
         num = 3
         match i:
             case 0:
-                colour_mode = 'Red'
+                colour_mode = 'All'
             case 1:
                 colour_mode = 'Blue'
             case 2:
                 colour_mode = 'Green'
             case 3:
-                colour_mode = 'All'
+                colour_mode = 'Red'
 
         # for row in tk.ttkrange(WIDTH):
 
-        display = tk_display()
+        display = tk_display(WIDTH)
         for row in display.display_progress(WIDTH):
             for col in range(HEIGHT):
                 if not is_random:
@@ -103,19 +124,6 @@ for i in range(90,200):
                         
                 img.putpixel(value=(hex_1,hex_2,hex_3),xy=(row,col))
                 
-                img_1 = img
-                img_2 = ImageOps.mirror(img_1)
-                img_3 = ImageOps.flip(img_2)
-                img_4 = ImageOps.flip(img_1)
-
-                full_image = Image.new('RGB',(WIDTH*2,HEIGHT*2))
-
-                full_image.paste(img_3,(0,0))
-                full_image.paste(img_4,(WIDTH,0))
-                full_image.paste(img_2,(0,HEIGHT))
-                full_image.paste(img_1,(WIDTH,HEIGHT))
-
-                display.update_screen(full_image)
                 
                 num += 3
                 for i in range(HEIGHT-1):
@@ -170,6 +178,21 @@ for i in range(90,200):
                                 temp = img.getpixel((j,i))
                                 img.putpixel((j,i),img.getpixel((i,j+1)))
                                 img.putpixel((j,i+1),temp)
+                img_1 = img
+                img_2 = ImageOps.mirror(img_1)
+                img_3 = ImageOps.flip(img_2)
+                img_4 = ImageOps.flip(img_1)
+
+                full_image = Image.new('RGB',(WIDTH*2,HEIGHT*2))
+
+                full_image.paste(img_3,(0,0))
+                full_image.paste(img_4,(WIDTH,0))
+                full_image.paste(img_2,(0,HEIGHT))
+                full_image.paste(img_1,(WIDTH,HEIGHT))
+
+                display.update_screen(full_image)
+                                
+        display.diplay_final_product(full_image)
         display.close()
         del display                
                         
